@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rest
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rest
+  template:
+    metadata:
+      labels:
+        app: rest
+    spec:
+      containers:
+      - name: rest
+        image: gcr.io/lab-7-kube/rest:v1
+        ports:
+        - containerPort: 5000
+        env:
+        - name: REDIS_HOST
+          value: "redis"
+        - name: MINIO_HOST
+          value: "myminio-proj.minio-ns.svc.cluster.local:9000"
+        - name: MINIO_ACCESS_KEY
+          value: "minioadmin"
+        - name: MINIO_SECRET_KEY
+          value: "minioadmin"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rest
+spec:
+  type: LoadBalancer
+  selector:
+    app: rest
+  ports:
+  - port: 5000
+    targetPort: 5000
