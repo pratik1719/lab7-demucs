@@ -1,0 +1,20 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: create-buckets
+spec:
+  template:
+    spec:
+      containers:
+      - name: mc
+        image: minio/mc
+        command:
+        - /bin/sh
+        - -c
+        - |
+          mc alias set myminio http://myminio-proj.minio-ns.svc.cluster.local:9000 minioadmin minioadmin
+          mc mb myminio/queue || echo "queue exists"
+          mc mb myminio/output || echo "output exists"
+          mc ls myminio
+      restartPolicy: Never
+  backoffLimit: 3
